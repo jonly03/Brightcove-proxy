@@ -1,1 +1,1 @@
-# Brightcove API Integration for DLS Needs
+# Brightcove API Integration Proxy for DLS Needs
