@@ -49,10 +49,16 @@ class BrightcoveHelper {
     }
   }
 
-  static async getVideos(limit = 20) {
+  static async getVideos(limit = 20, id = null) {
     try {
       const token = await this.getAccessToken();
-      const url = `${this.brightcoveBaseUrl}${this.accountId}/videos?limit=${limit}`;
+      let url = `${this.brightcoveBaseUrl}${this.accountId}/videos`;
+
+      if (id) {
+        url += `/${id}`;
+      } else {
+        url += `?limit=${limit}`;
+      }
 
       const response = await fetch(url, {
         method: "GET",

@@ -18,4 +18,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const video = await BrightcoveHelper.getVideos(1, req.params.id);
+    if (video.error) {
+      return res.status(500).json({ error: video.error });
+    }
+    res.json(video);
+  } catch (error) {
+    console.error("Error handling /videos/:id request:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
