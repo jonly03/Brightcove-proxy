@@ -16,6 +16,10 @@ class BrightcoveHelper {
       return this.accessToken;
     }
 
+    console.log("Fetching new access token...");
+    console.log(`Client ID: ${this.clientId}`);
+    console.log(`Client Secret: ${this.clientSecret}`);
+
     const authString = Buffer.from(
       `${this.clientId}:${this.clientSecret}`
     ).toString("base64");
