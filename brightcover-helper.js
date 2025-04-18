@@ -49,7 +49,7 @@ class BrightcoveHelper {
     }
   }
 
-  static async getVideos({ limit = 20, id = null, query = null }) {
+  static async getVideos({ limit = 100, id = null, query = null }) {
     try {
       const token = await this.getAccessToken();
       let url = `${this.brightcoveBaseUrl}${this.accountId}`;
