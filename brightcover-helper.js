@@ -16,10 +16,6 @@ class BrightcoveHelper {
       return this.accessToken;
     }
 
-    console.log("Fetching new access token...");
-    console.log(`Client ID: ${this.clientId}`);
-    console.log(`Client Secret: ${this.clientSecret}`);
-
     const authString = Buffer.from(
       `${this.clientId}:${this.clientSecret}`
     ).toString("base64");
@@ -53,16 +49,21 @@ class BrightcoveHelper {
     }
   }
 
-  static async getVideos(limit = 20, id = null) {
+  static async getVideos({ limit = 20, id = null, query = null }) {
     try {
       const token = await this.getAccessToken();
-      let url = `${this.brightcoveBaseUrl}${this.accountId}/videos`;
+      let url = `${this.brightcoveBaseUrl}${this.accountId}`;
 
       if (id) {
-        url += `/${id}`;
+        url += `/videos/${id}`;
       } else {
-        url += `?limit=${limit}`;
+        url += `/videos?limit=${limit}`;
+        if (query) {
+          url += `&query=+text:"${encodeURIComponent(query)}"`;
+        }
+        url += `&sort=-created_at`;
       }
+      console.log("Fetching videos from URL:", url);
 
       const response = await fetch(url, {
         method: "GET",

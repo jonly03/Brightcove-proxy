@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const videos = await BrightcoveHelper.getVideos(req.query.limit);
+    const videos = await BrightcoveHelper.getVideos({ limit: req.query.limit });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
     }
@@ -18,9 +18,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/search", async (req, res) => {
+  try {
+    const { q, limit } = req.query;
+    const videos = await BrightcoveHelper.getVideos({ limit, query: q });
+    if (videos.error) {
+      return res.status(500).json({ error: videos.error });
+    }
+    res.json(videos);
+  } catch (error) {
+    console.error("Error handling /videos/search request:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
-    const video = await BrightcoveHelper.getVideos(1, req.params.id);
+    const video = await BrightcoveHelper.getVideos({
+      limit: 1,
+      id: req.params.id,
+    });
     if (video.error) {
       return res.status(500).json({ error: video.error });
     }
