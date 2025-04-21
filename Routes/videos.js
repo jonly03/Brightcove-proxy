@@ -20,8 +20,12 @@ router.get("/", async (req, res) => {
 
 router.get("/search", async (req, res) => {
   try {
-    const { q, limit } = req.query;
-    const videos = await BrightcoveHelper.getVideos({ limit, query: q });
+    const { searchTerm, hasTextTracks, limit } = req.query;
+    const videos = await BrightcoveHelper.getVideos({
+      limit,
+      searchTerm,
+      hasTextTracks,
+    });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
     }
