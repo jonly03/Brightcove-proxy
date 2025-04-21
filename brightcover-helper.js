@@ -49,7 +49,12 @@ class BrightcoveHelper {
     }
   }
 
-  static async getVideos({ limit = 100, id = null, query = null }) {
+  static async getVideos({
+    limit = 100,
+    id = null,
+    searchTerm = null,
+    hasTextTracks = false,
+  }) {
     try {
       const token = await this.getAccessToken();
       let url = `${this.brightcoveBaseUrl}${this.accountId}`;
@@ -58,9 +63,18 @@ class BrightcoveHelper {
         url += `/videos/${id}`;
       } else {
         url += `/videos?limit=${limit}`;
-        if (query) {
-          url += `&query=+text:"${encodeURIComponent(query)}"`;
+        let queryString = "";
+        if (searchTerm) {
+          queryString = encodeURIComponent(`(+text:${searchTerm})`);
         }
+
+        if (hasTextTracks === "true") {
+          queryString += encodeURIComponent(
+            ` AND (+has_text_tracks:${hasTextTracks})`
+          );
+        }
+
+        url += `&query=${queryString}`;
         url += `&sort=-created_at`;
       }
       console.log("Fetching videos from URL:", url);
