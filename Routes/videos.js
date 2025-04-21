@@ -7,8 +7,12 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const { limit, hasTextTracks } = req.query;
-    const videos = await BrightcoveHelper.getVideos({ limit, hasTextTracks });
+    const { limit, hasTextTracks, hasDescription } = req.query;
+    const videos = await BrightcoveHelper.getVideos({
+      limit,
+      hasTextTracks,
+      hasDescription,
+    });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
     }
@@ -21,11 +25,12 @@ router.get("/", async (req, res) => {
 
 router.get("/search", async (req, res) => {
   try {
-    const { searchTerm, hasTextTracks, limit } = req.query;
+    const { searchTerm, hasTextTracks, limit, hasDescription } = req.query;
     const videos = await BrightcoveHelper.getVideos({
       limit,
       searchTerm,
       hasTextTracks,
+      hasDescription,
     });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
