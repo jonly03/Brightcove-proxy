@@ -7,7 +7,8 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const videos = await BrightcoveHelper.getVideos({ limit: req.query.limit });
+    const { limit, hasTextTracks } = req.query;
+    const videos = await BrightcoveHelper.getVideos({ limit, hasTextTracks });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
     }

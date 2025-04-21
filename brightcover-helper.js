@@ -69,8 +69,11 @@ class BrightcoveHelper {
         }
 
         if (hasTextTracks === "true") {
+          if (searchTerm) {
+            queryString += encodeURIComponent(" AND ");
+          }
           queryString += encodeURIComponent(
-            ` AND (+has_text_tracks:${hasTextTracks})`
+            `(+has_text_tracks:${hasTextTracks})`
           );
         }
 
