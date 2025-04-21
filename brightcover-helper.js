@@ -54,6 +54,7 @@ class BrightcoveHelper {
     id = null,
     searchTerm = null,
     hasTextTracks = false,
+    hasDescription = false,
   }) {
     try {
       const token = await this.getAccessToken();
@@ -93,7 +94,14 @@ class BrightcoveHelper {
         throw new Error(`Failed to fetch videos: ${response.statusText}`);
       }
 
-      const videos = await response.json();
+      let videos = await response.json();
+
+      if (hasDescription === "true") {
+        videos = videos.filter(
+          (video) => video.description || video.long_description
+        );
+      }
+
       return videos;
     } catch (error) {
       console.error("Error fetching videos:", error.message);
