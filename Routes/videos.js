@@ -7,11 +7,21 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const { limit, hasTextTracks, hasDescription } = req.query;
-    const videos = await BrightcoveHelper.getVideos({
-      limit,
+    const {
+      searchByDescription,
+      searchByName,
+      searchByTags,
       hasTextTracks,
       hasDescription,
+    } = req.query;
+    const videos = await BrightcoveHelper.getVideos({
+      filters: {
+        searchByDescription,
+        searchByName,
+        searchByTags,
+        hasTextTracks,
+        hasDescription,
+      },
     });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
@@ -25,12 +35,23 @@ router.get("/", async (req, res) => {
 
 router.get("/search", async (req, res) => {
   try {
-    const { searchTerm, hasTextTracks, limit, hasDescription } = req.query;
-    const videos = await BrightcoveHelper.getVideos({
-      limit,
+    const {
       searchTerm,
+      searchByDescription,
+      searchByName,
+      searchByTags,
       hasTextTracks,
       hasDescription,
+    } = req.query;
+    const videos = await BrightcoveHelper.getVideos({
+      searchTerm,
+      filters: {
+        searchByDescription,
+        searchByName,
+        searchByTags,
+        hasTextTracks,
+        hasDescription,
+      },
     });
     if (videos.error) {
       return res.status(500).json({ error: videos.error });
