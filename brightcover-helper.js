@@ -53,8 +53,7 @@ class BrightcoveHelper {
     limit = 100,
     id = null,
     searchTerm = null,
-    hasTextTracks = false,
-    hasDescription = false,
+    filters,
   }) {
     try {
       const token = await this.getAccessToken();
@@ -65,12 +64,65 @@ class BrightcoveHelper {
       } else {
         url += `/videos?limit=${limit}`;
         let queryString = "";
-        if (searchTerm) {
-          queryString = encodeURIComponent(`(+text:${searchTerm})`);
+        const {
+          searchByDescription,
+          searchByName,
+          searchByTags,
+          hasTextTracks,
+        } = filters;
+
+        if (searchTerm && searchTerm.length > 0) {
+          if (searchByDescription || searchByName || searchByTags) {
+            if (searchByTags && searchByTags === "true") {
+              // TODO: Eventually rip up to search for tags in addition other fields
+
+              // searchTerm is a comma seprated list of tags
+              // example: "tag1,tag2,tag3"
+              // Transform searchTeam to wrap each tag in quotes and keep the commas
+              // example: "'tag1','tag2','tag3'"
+              // const tags = searchTerm.split(",");
+              // const tagsString = tags.map((tag) => tag.trim()).join(",");
+              let tagsString = "";
+              searchTerm.split(",").forEach((tag) => {
+                if (tag.length > 0 && tagsString.length > 0) {
+                  tagsString += ",";
+                }
+                if (tag.length > 0) {
+                  tagsString += `"${tag.trim()}"`;
+                }
+              });
+
+              console.log("Tags string:", tagsString);
+
+              queryString += encodeURIComponent(`(+tags:${tagsString})`);
+
+              // queryString += encodeURIComponent(`(+tags:${searchTerm})`);
+            } else {
+              if (
+                searchByName &&
+                searchByName === "true" &&
+                searchByDescription &&
+                searchByDescription === "true"
+              ) {
+                queryString = encodeURIComponent(`(+text:${searchTerm})`);
+              } else if (searchByName && searchByName === "true") {
+                queryString += encodeURIComponent(`(+name:${searchTerm})`);
+              } else if (
+                searchByDescription &&
+                searchByDescription === "true"
+              ) {
+                queryString += encodeURIComponent(
+                  `(+description:${searchTerm})`
+                );
+              }
+            }
+          } else {
+            queryString = encodeURIComponent(`(+text:${searchTerm})`);
+          }
         }
 
         if (hasTextTracks === "true") {
-          if (searchTerm) {
+          if (queryString.length > 0) {
             queryString += encodeURIComponent(" AND ");
           }
           queryString += encodeURIComponent(
@@ -78,8 +130,12 @@ class BrightcoveHelper {
           );
         }
 
-        url += `&query=${queryString}`;
-        url += `&sort=-created_at`;
+        if (queryString.length > 0) {
+          url += `&query=${queryString}`;
+        }
+
+        // Let Brightcove automaticaly handle sorting by relevance when there is a search term or by created_at when there is no search term
+        url += `&sort=-updated_at`;
       }
       console.log("Fetching videos from URL:", url);
 
@@ -96,7 +152,7 @@ class BrightcoveHelper {
 
       let videos = await response.json();
 
-      if (hasDescription === "true") {
+      if (filters && filters.hasDescription === "true") {
         videos = videos.filter(
           (video) => video.description || video.long_description
         );
